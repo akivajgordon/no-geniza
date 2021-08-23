@@ -17,7 +17,7 @@ const regexRange = ({ start, end, excluding }: { start: string, end: string, exc
 const REGEXP_NIKKUD_AND_CANTILLATION_RANGE_EXCLUDING_SOF_PASUK = regexRange({ start: UNICODE_NIKKUD_AND_CANTILLATION_START, end: UNICODE_NIKKUD_AND_CANTILLATION_END, excluding: [SOF_PASUK]})
 
 const like = (word: string): RegExp => {
-  return new RegExp(`${word.split('').map(l => `${l}${REGEXP_NIKKUD_AND_CANTILLATION_RANGE_EXCLUDING_SOF_PASUK}*`).join('')}`)
+  return new RegExp(`${word.split('').map(l => `${l}${REGEXP_NIKKUD_AND_CANTILLATION_RANGE_EXCLUDING_SOF_PASUK}*`).join('')}`, 'g')
 }
 
 export default (s: string): string => {
