@@ -7,3 +7,19 @@
 .SplitLayout > * {
   width: 100%;
 }
+
+.Button {
+  border-radius: 4px;
+  border: none;
+  background: hsl(0, 0%, 80%);
+  padding: 0.1rem 0.5rem;
+  color: black;
+}
+
+.Button:hover {
+  background: hsl(0, 0%, 75%);
+}
+
+.Button:active {
+  background: hsl(0, 0%, 70%);
+}
