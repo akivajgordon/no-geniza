@@ -12,11 +12,11 @@ function App() {
     <SplitLayout>
       <div>
       <label style={{display: 'block'}}>Source</label>
-      <textarea dir="rtl" style={{width: '100%', boxSizing: 'border-box'}} value={input} onChange={e => setInput(e.target.value)} />
+      <textarea dir="rtl" style={{width: '100%', maxWidth: '100%', boxSizing: 'border-box'}} value={input} onChange={e => setInput(e.target.value)} />
       </div>
       <div>
       <label style={{display: 'block'}}>Processed</label>
-      <textarea dir="rtl" style={{width: '100%', boxSizing: 'border-box'}} value={noGeniza(input)} disabled />
+      <textarea dir="rtl" style={{width: '100%', maxWidth: '100%', boxSizing: 'border-box'}} value={noGeniza(input)} disabled />
 
       </div>
     </SplitLayout>
