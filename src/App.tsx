@@ -114,7 +114,7 @@ function App() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <img
-                      src="/content_copy_black_24dp.svg"
+                      src={`${process.env.PUBLIC_URL}/content_copy_black_24dp.svg`}
                       height="16"
                       style={{ filter: 'invert()' }}
                     />
@@ -151,7 +151,7 @@ function App() {
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <a href="https://github.com/akivajgordon/no-geniza">
               <img
-                src="/github.svg"
+                src={`${process.env.PUBLIC_URL}/github.svg`}
                 height="30"
                 style={{ filter: 'invert(0.7)' }}
               />
