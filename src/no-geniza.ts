@@ -1,6 +1,5 @@
 const ALEPH = 'א'
 const LAMED = 'ל'
-const MEM_SOFIT = 'ם'
 const YUD = 'י'
 const HEY = 'ה'
 const VAV = 'ו'
@@ -46,7 +45,7 @@ const like = (word: string): RegExp => {
 export default (s: string): string => {
   return s
     .replace(like([YUD, HEY, VAV, HEY].join('')), 'ה׳')
-    .replace(like([ALEPH, LAMED, HEY, YUD, MEM_SOFIT].join('')), (match) =>
+    .replace(like([ALEPH, LAMED, HEY, YUD].join('')), (match) =>
       match.split(LAMED).join(`-${LAMED}`)
     )
 }
