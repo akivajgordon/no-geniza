@@ -7,7 +7,7 @@ const SplitLayout: React.FC<{}> = ({ children }) => {
 }
 
 enum ButtonType {
-  action,
+  action = 'action',
 }
 
 const Button: React.FC<{ onClick(): void; type: ButtonType }> = ({
@@ -15,23 +15,73 @@ const Button: React.FC<{ onClick(): void; type: ButtonType }> = ({
   onClick,
   type,
 }) => {
-  const buttonStylesByType = {
-    [ButtonType.action]: 'action',
-  }
-
   return (
-    <button className={`Button ${buttonStylesByType[type]}`} onClick={onClick}>
+    <button className={`Button ${type}`} onClick={onClick}>
       {children}
     </button>
   )
 }
 
-const Stack: React.FC<{}> = ({ children }) => {
-  return <div className="stack">{children}</div>
+enum StackSize {
+  sm = 'sm',
+  md = 'md',
+  lg = 'lg',
+  xl = 'xl',
 }
+
+const Stack: React.FC<{ size?: StackSize }> = ({
+  children,
+  size = StackSize.md,
+}) => {
+  return <div className={`stack ${size}`}>{children}</div>
+}
+
+interface TextAreaProps {
+  value: string
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  disabled?: boolean
+  placeholder?: string
+}
+
+const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
+  ({ value, onChange, disabled, placeholder }, ref) => {
+    return (
+      <textarea
+        ref={ref}
+        dir={/[א-ת]/.test(value[0]) ? 'rtl' : 'ltr'}
+        placeholder={placeholder}
+        style={{
+          width: '100%',
+          height: '10em',
+          fontSize: '1.5rem',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+          background: 'none',
+          border: 'none',
+          resize: 'none',
+          outline: 'none',
+        }}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+      />
+    )
+  }
+)
+
+const Centered: React.FC<{}> = ({ children }) => (
+  <div style={{ display: 'flex', justifyContent: 'center' }}>{children}</div>
+)
 
 function App() {
   const [input, setInput] = React.useState('')
+  const [
+    recentlyCopiedToClipboard,
+    setRecentlyCopiedToClipboard,
+  ] = React.useState(false)
+  const copiedToClipboardTimer = React.useRef<
+    ReturnType<typeof window.setTimeout>
+  >()
   const inputArea = React.useRef<HTMLTextAreaElement | null>(null)
 
   React.useEffect(() => {
@@ -42,7 +92,7 @@ function App() {
 
   return (
     <div style={{ padding: '2em' }}>
-      <Stack>
+      <Stack size={StackSize.xl}>
         <div
           style={{
             width: '100%',
@@ -55,21 +105,23 @@ function App() {
             zIndex: -1,
           }}
         />
-        <h1>No Geniza</h1>
-        <ol>
-          {[
-            `Paste source text that might contain holy names that would require geniza.`,
-            `Copy the result to your clipboard.`,
-            `Paste into your document. Now feel free to print it without worrying. Great for printing source sheets for a d'var Torah.`,
-          ].map((step) => (
-            <li key={step}>{step}</li>
-          ))}
-        </ol>
-        <a href="https://en.wikipedia.org/wiki/Genizah">
-          <strong>
-            <em>{`"Geniza" on Wikipedia`}</em>
-          </strong>
-        </a>
+        <Stack>
+          <h1>No Geniza</h1>
+          <ol>
+            {[
+              `Paste source text that might contain holy names that would require geniza.`,
+              `Copy the result to your clipboard.`,
+              `Paste into your document. Now feel free to print it without worrying. Great for printing source sheets for a d'var Torah.`,
+            ].map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+          <em>
+            <a href="https://en.wikipedia.org/wiki/Genizah">
+              <strong>{`"Geniza" on Wikipedia`}</strong>
+            </a>
+          </em>
+        </Stack>
 
         <div
           style={{
@@ -89,29 +141,38 @@ function App() {
                 background: 'hsla(0, 0%, 0%, 0.05)',
               }}
             >
-              <textarea
-                dir={/[א-ת]/.test(input[0]) ? 'rtl' : 'ltr'}
-                style={{
-                  width: '100%',
-                  height: '10em',
-                  fontSize: '1.5rem',
-                  maxWidth: '100%',
-                  boxSizing: 'border-box',
-                  background: 'none',
-                  border: 'none',
-                  resize: 'none',
-                  outline: 'none',
-                }}
-                value={processed}
-                disabled
-              />
+              <TextArea value={processed} disabled />
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
                   type={ButtonType.action}
                   onClick={() => {
-                    navigator.clipboard.writeText(processed)
+                    copiedToClipboardTimer.current &&
+                      clearTimeout(copiedToClipboardTimer.current)
+
+                    navigator.clipboard.writeText(processed).then(() => {
+                      setRecentlyCopiedToClipboard(true)
+                      copiedToClipboardTimer.current = setTimeout(() => {
+                        setRecentlyCopiedToClipboard(false)
+                      }, 1500)
+                    })
                   }}
                 >
+                  {recentlyCopiedToClipboard && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '0',
+                        background: 'black',
+                        color: 'white',
+                        left: '50%',
+                        transform: 'translate(-50%, calc(-100% - 0.5em))',
+                        padding: '0.5em 0.75em',
+                        borderRadius: '4px',
+                      }}
+                    >
+                      ✓&nbsp;Copied
+                    </div>
+                  )}
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <img
                       src={`${process.env.PUBLIC_URL}/content_copy_black_24dp.svg`}
@@ -126,37 +187,38 @@ function App() {
               </div>
             </div>
             <div style={{ padding: '1.5em' }}>
-              <textarea
+              <TextArea
                 ref={inputArea}
-                dir={/[א-ת]/.test(input[0]) ? 'rtl' : 'ltr'}
                 placeholder="Paste (or type) source text here..."
-                style={{
-                  width: '100%',
-                  height: '10em',
-                  fontSize: '1.5rem',
-                  maxWidth: '100%',
-                  boxSizing: 'border-box',
-                  background: 'none',
-                  border: 'none',
-                  resize: 'none',
-                  outline: 'none',
-                }}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
               />
             </div>
           </SplitLayout>
         </div>
-        <footer style={{ marginTop: '5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <a href="https://github.com/akivajgordon/no-geniza">
-              <img
-                src={`${process.env.PUBLIC_URL}/github.svg`}
-                height="30"
-                style={{ filter: 'invert(0.7)' }}
-              />
-            </a>
-          </div>
+        <footer>
+          <Stack>
+            <Centered>
+              <span style={{ color: 'hsla(0, 0%, 0%, 0.5)', fontSize: '0.8rem' }}>
+                <em>
+                  Like this? You might also like{' '}
+                  <strong>
+                    <a href="https://tikkun.io">tikkun.io</a>
+                  </strong>
+                  .
+                </em>
+              </span>
+            </Centered>
+            <Centered>
+              <a href="https://github.com/akivajgordon/no-geniza">
+                <img
+                  src={`${process.env.PUBLIC_URL}/github.svg`}
+                  height="30"
+                  style={{ filter: 'invert(0.7)' }}
+                />
+              </a>
+            </Centered>
+          </Stack>
         </footer>
       </Stack>
     </div>

@@ -18,6 +18,7 @@
   padding: 0.1rem 0.5rem;
   color: var(--button-color);
   cursor: pointer;
+  position: relative;
 }
 
 .Button:hover {
@@ -36,5 +37,18 @@
 }
 
 .stack > * + * {
-  margin-top: 1.5em;
+  margin-top: var(--stack-size, 1.5em);
+}
+
+.stack.sm {
+  --stack-size: 1em;
+}
+.stack.md {
+  --stack-size: 1.5em;
+}
+.stack.lg {
+  --stack-size: 2.5em;
+}
+.stack.xl {
+  --stack-size: 3.5em;
 }
